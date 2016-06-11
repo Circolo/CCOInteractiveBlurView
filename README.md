@@ -1,9 +1,11 @@
 # CCOInteractiveBlurView
 
-[![CI Status](http://img.shields.io/travis/Gian Franco Zabarino/CCOInteractiveBlurView.svg?style=flat)](https://travis-ci.org/Gian Franco Zabarino/CCOInteractiveBlurView)
-[![Version](https://img.shields.io/cocoapods/v/CCOInteractiveBlurView.svg?style=flat)](http://cocoapods.org/pods/CCOInteractiveBlurView)
-[![License](https://img.shields.io/cocoapods/l/CCOInteractiveBlurView.svg?style=flat)](http://cocoapods.org/pods/CCOInteractiveBlurView)
-[![Platform](https://img.shields.io/cocoapods/p/CCOInteractiveBlurView.svg?style=flat)](http://cocoapods.org/pods/CCOInteractiveBlurView)
+## Description
+
+This library aims to mimic the `UIVisualEffectView` behavior when configured with a `UIBlurEffect` effect.
+Whatever view you insert into its `contentView` won't be blurred, but everything in the background of it will.
+The main difference when comparing to `UIVisualEffectView` is that it allows to be configured with percentage values, from `0.0` to `1.0`, `0.0` being not blurred at all, and `1.0` being fully blurred.
+NOTE: you need to make a call to `prepareBlurEffect` every time you are going to use this view, before starting to animate it / set percentage values to it.
 
 ## Example
 
@@ -26,4 +28,4 @@ Gian Franco Zabarino, gfzabarino@gmail.com
 
 ## License
 
-CCOInteractiveBlurView is available under the MIT license. See the LICENSE file for more info.
+CCOInteractiveBlurView is available under the Apache 2.0 license. See the LICENSE.md file for more info.

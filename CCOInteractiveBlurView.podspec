@@ -1,42 +1,22 @@
-#
-# Be sure to run `pod lib lint CCOInteractiveBlurView.podspec' to ensure this is a
-# valid spec before submitting.
-#
-# Any lines starting with a # are optional, but their use is encouraged
-# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
-#
-
 Pod::Spec.new do |s|
   s.name             = 'CCOInteractiveBlurView'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of CCOInteractiveBlurView.'
-
-# This description is used to generate tags and improve search results.
-#   * Think: What does it do? Why did you write it? What is the focus?
-#   * Try to keep it short, snappy and to the point.
-#   * Write the description between the DESC delimiters below.
-#   * Finally, don't worry about the indent, CocoaPods strips it!
+  s.summary          = 'Interactive Blur View, inspired on UIVisualEffectView configured with UIBlurEffect.'
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+Interactive Blur View, inspired on UIVisualEffectView configured with UIBlurEffect. The blurring effect can be set
+proportionally to a given percentage, ideal to be used with a UIPanGestureRecognizer that changes this value.
                        DESC
 
-  s.homepage         = 'https://github.com/<GITHUB_USERNAME>/CCOInteractiveBlurView'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
+  s.homepage         = 'https://github.com/Circolo/CCOInteractiveBlurView'
+  s.license          = { :type => 'Apache 2.0', :file => 'LICENSE.md' }
   s.author           = { 'Gian Franco Zabarino' => 'gfzabarino@gmail.com' }
-  s.source           = { :git => 'https://github.com/<GITHUB_USERNAME>/CCOInteractiveBlurView.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.source           = { :git => 'https://github.com/Circolo/CCOInteractiveBlurView.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '8.0'
 
   s.source_files = 'CCOInteractiveBlurView/Classes/**/*'
-  
-  # s.resource_bundles = {
-  #   'CCOInteractiveBlurView' => ['CCOInteractiveBlurView/Assets/*.png']
-  # }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.public_header_files = 'Pod/Classes/**/*.h'
+  s.frameworks = 'UIKit', 'Accelerate'
 end

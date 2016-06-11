@@ -1,0 +1,16 @@
+PODS:
+  - CCOInteractiveBlurView (0.1.0)
+
+DEPENDENCIES:
+  - CCOInteractiveBlurView (from `../`)
+
+EXTERNAL SOURCES:
+  CCOInteractiveBlurView:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CCOInteractiveBlurView: bede15c2217aa331ea8efc80d94753d89f6b93d8
+
+PODFILE CHECKSUM: 78cb5630595dbf727e98da00fc7f7fd1eb020090
+
+COCOAPODS: 1.0.1
