@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'CCOInteractiveBlurView_Example' do
+  pod 'CCOInteractiveBlurView', :path => '../'
+
+  target 'CCOInteractiveBlurView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
