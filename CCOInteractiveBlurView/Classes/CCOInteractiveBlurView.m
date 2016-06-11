@@ -73,9 +73,11 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
     [firstWindowSubview.superview addSubview:self.contentView];
     self.contentView.frame = outOfHierarchyFrame;
     CFAbsoluteTime now = CFAbsoluteTimeGetCurrent();
-    // make this fast, set scale to 1
-    UIGraphicsBeginImageContextWithOptions(self.bounds.size, YES, 1.0);
     CGRect rectInView = [firstWindowSubview convertRect:self.bounds fromView:self];
+    // make this fast, set scale to 1
+    UIGraphicsBeginImageContextWithOptions(rectInView.size, YES, 1.0);
+    rectInView.origin.y = -rectInView.origin.y;
+    rectInView.size = firstWindowSubview.bounds.size;
     [firstWindowSubview drawViewHierarchyInRect:rectInView afterScreenUpdates:YES];
     self.snapshotImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
@@ -107,6 +109,8 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
 }
 
 - (void)showBlur:(BOOL)showBlur animated:(BOOL)animated duration:(NSTimeInterval)duration completion:(void (^)())completion {
+    self.firstImageView.hidden = NO;
+    self.secondImageView.hidden = NO;
     if (animated) {
         // trigger correction of any invalid alpha value
         self.percentage = self.percentage;
@@ -122,6 +126,8 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
         } else {
             self.secondImageView.alpha = 0.0;
             self.firstImageView.image = self.snapshotImage;
+            self.firstImageView.hidden = YES;
+            self.secondImageView.hidden = YES;
         }
     }
 }
@@ -150,8 +156,6 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
 }
 
 - (void)animate:(NSUInteger)step duration:(NSTimeInterval)duration reverse:(BOOL)reverse completion:(void (^)())completion {
-    self.firstImageView.hidden = NO;
-    self.secondImageView.hidden = NO;
     [UIView animateWithDuration:duration / ((NSTimeInterval)self.blurredImages.count - 1)
                      animations:^{
                          self.secondImageView.alpha = reverse ? 0.0 : 1.0;
