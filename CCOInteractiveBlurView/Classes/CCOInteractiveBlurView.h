@@ -15,6 +15,6 @@
 
 - (instancetype)initWithNumberOfStages:(NSUInteger)numberOfStages;
 - (void)prepareBlurEffect;
-- (void)showBlur:(BOOL)showBlur animated:(BOOL)animated duration:(CGFloat)duration completion:(void (^)())completion;
+- (void)showBlur:(BOOL)showBlur animated:(BOOL)animated duration:(NSTimeInterval)duration completion:(void (^)())completion;
 
 @end

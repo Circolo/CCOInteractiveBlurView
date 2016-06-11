@@ -29,7 +29,7 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
 @property(nonatomic, assign) NSUInteger numberOfStages;
 
 - (void)setupWithNumberOfStages:(NSUInteger)numberOfStages;
-- (void)animate:(NSUInteger)step duration:(CGFloat)duration reverse:(BOOL)reverse completion:(void (^)())completion;
+- (void)animate:(NSUInteger)step duration:(NSTimeInterval)duration reverse:(BOOL)reverse completion:(void (^)())completion;
 
 @end
 
@@ -106,7 +106,7 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
     }
 }
 
-- (void)showBlur:(BOOL)showBlur animated:(BOOL)animated duration:(CGFloat)duration completion:(void (^)())completion {
+- (void)showBlur:(BOOL)showBlur animated:(BOOL)animated duration:(NSTimeInterval)duration completion:(void (^)())completion {
     if (animated) {
         // trigger correction of any invalid alpha value
         self.percentage = self.percentage;
@@ -149,10 +149,10 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
     [self.contentView addSubview:self.secondImageView];
 }
 
-- (void)animate:(NSUInteger)step duration:(CGFloat)duration reverse:(BOOL)reverse completion:(void (^)())completion {
+- (void)animate:(NSUInteger)step duration:(NSTimeInterval)duration reverse:(BOOL)reverse completion:(void (^)())completion {
     self.firstImageView.hidden = NO;
     self.secondImageView.hidden = NO;
-    [UIView animateWithDuration:duration / ((CGFloat)self.blurredImages.count - 1)
+    [UIView animateWithDuration:duration / ((NSTimeInterval)self.blurredImages.count - 1)
                      animations:^{
                          self.secondImageView.alpha = reverse ? 0.0 : 1.0;
                      }
