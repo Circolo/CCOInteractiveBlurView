@@ -109,25 +109,21 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
 }
 
 - (void)showBlur:(BOOL)showBlur animated:(BOOL)animated duration:(NSTimeInterval)duration completion:(void (^)())completion {
-    self.firstImageView.hidden = NO;
-    self.secondImageView.hidden = NO;
     if (animated) {
-        // trigger correction of any invalid alpha value
-        self.percentage = self.percentage;
         NSUInteger currentBlurIndex = (NSUInteger) (MIN(1.0, MAX(self.percentage, 0.0)) * (CGFloat) self.numberOfStages);
+        if (showBlur && self.firstImageView.hidden) {
+            self.firstImageView.hidden = NO;
+            self.secondImageView.hidden = NO;
+        }
         [self animate:currentBlurIndex
              duration:duration
               reverse:!showBlur
            completion:completion];
     } else {
         if (showBlur) {
-            self.secondImageView.image = [self.blurredImages lastObject];
-            self.secondImageView.alpha = 1.0;
+            self.percentage = 1.0;
         } else {
-            self.secondImageView.alpha = 0.0;
-            self.firstImageView.image = self.snapshotImage;
-            self.firstImageView.hidden = YES;
-            self.secondImageView.hidden = YES;
+            self.percentage = 0.0;
         }
     }
 }
@@ -209,10 +205,10 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
     if (self.secondImageView.image != self.blurredImages[blurIndex + 1]) {
         self.secondImageView.image = self.blurredImages[blurIndex + 1];
     }
-    if (percentage < FLT_MIN) {
+    if (percentage < FLT_MIN && !self.firstImageView.hidden) {
         self.firstImageView.hidden = YES;
         self.secondImageView.hidden = YES;
-    } else {
+    } else if (percentage > FLT_MIN && self.firstImageView.hidden) {
         self.firstImageView.hidden = NO;
         self.secondImageView.hidden = NO;
     }
