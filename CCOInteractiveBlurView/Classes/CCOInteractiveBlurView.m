@@ -27,6 +27,7 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
 @property(nonatomic, strong) UIImageView *firstImageView;
 @property(nonatomic, strong) UIImageView *secondImageView;
 @property(nonatomic, assign) NSUInteger numberOfStages;
+@property(nonatomic, assign) CFAbsoluteTime animationStartTime;
 
 - (void)setupWithNumberOfStages:(NSUInteger)numberOfStages;
 - (void)animate:(NSUInteger)step duration:(NSTimeInterval)duration reverse:(BOOL)reverse completion:(void (^)())completion;
@@ -123,6 +124,7 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
             self.firstImageView.hidden = NO;
             self.secondImageView.hidden = NO;
         }
+        self.animationStartTime = CFAbsoluteTimeGetCurrent();
         [self animate:currentBlurIndex
              duration:duration
               reverse:!showBlur
@@ -160,7 +162,10 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
 }
 
 - (void)animate:(NSUInteger)step duration:(NSTimeInterval)duration reverse:(BOOL)reverse completion:(void (^)())completion {
-    [UIView animateWithDuration:duration / ((NSTimeInterval)self.blurredImages.count - 1)
+    CFAbsoluteTime currentAnimationDuration = CFAbsoluteTimeGetCurrent() - self.animationStartTime;
+    NSUInteger numberOfRemainingAnimations = reverse ? (step + 1) : (self.blurredImages.count - 1 - step);
+    NSLog(@"remaining animations: %d", numberOfRemainingAnimations);
+    [UIView animateWithDuration:MAX(0.0, (duration - currentAnimationDuration)) / ((NSTimeInterval)numberOfRemainingAnimations)
                      animations:^{
                          self.secondImageView.alpha = reverse ? 0.0 : 1.0;
                      }
