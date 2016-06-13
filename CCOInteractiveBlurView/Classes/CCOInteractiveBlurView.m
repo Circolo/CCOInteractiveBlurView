@@ -106,9 +106,17 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
     for (NSUInteger i = 1; i <= self.numberOfStages + 1; i++) {
         self.blurredImages[i] = self.blurredImagesDictionary[@(i)];
     }
+    if (self.percentage > CGFLOAT_MIN) {
+        // trigger percentage setting with updated blur images
+        self.percentage = self.percentage;
+    }
 }
 
 - (void)showBlur:(BOOL)showBlur animated:(BOOL)animated duration:(NSTimeInterval)duration completion:(void (^)())completion {
+    if (!self.blurredImages.count) {
+        DLog(@"No blurred images have been generated yet, please call prepareBlurEffect to fix this");
+        return;
+    }
     if (animated) {
         NSUInteger currentBlurIndex = (NSUInteger) (MIN(1.0, MAX(self.percentage, 0.0)) * (CGFloat) self.numberOfStages);
         if (showBlur && self.firstImageView.hidden) {
@@ -157,9 +165,19 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
                          self.secondImageView.alpha = reverse ? 0.0 : 1.0;
                      }
                      completion:^(BOOL finished) {
-                         if ((!reverse && step + 2 < self.blurredImages.count) ||
-                                 (reverse && (NSInteger) step - 1 >= 0)) {
-                             if (finished) {
+                         void (^finish)() = ^{
+                             if (reverse) {
+                                 self.firstImageView.hidden = YES;
+                                 self.secondImageView.hidden = YES;
+                             }
+                             if (completion) {
+                                 completion();
+                             }
+                         };
+                         _percentage = step + (reverse ? 0 : 1) / (self.blurredImages.count - 1);
+                         if (finished) {
+                             if ((!reverse && step + 1 < self.blurredImages.count - 1) ||
+                                     (reverse && (NSInteger) step - 1 >= 0)) {
                                  self.firstImageView.image = self.blurredImages[step];
                                  self.secondImageView.alpha = reverse ? 1.0 : 0.0;
                                  self.secondImageView.image = self.blurredImages[step + 1];
@@ -167,18 +185,11 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
                                       duration:duration
                                        reverse:reverse
                                     completion:completion];
+                             } else {
+                                 finish();
                              }
                          } else {
-                             if (reverse) {
-                                 _percentage = 0.0;
-                                 self.firstImageView.hidden = YES;
-                                 self.secondImageView.hidden = YES;
-                             } else {
-                                 _percentage = 1.0;
-                             }
-                             if (completion) {
-                                 completion();
-                             }
+                             finish();
                          }
                      }];
 }
@@ -191,6 +202,10 @@ static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
 
 - (void)setPercentage:(CGFloat)percentage {
     _percentage = percentage;
+    if (!self.blurredImages.count) {
+        DLog(@"No blurred images have been generated yet, please call prepareBlurEffect to fix this");
+        return;
+    }
     percentage = MIN(1.0, MAX(percentage, 0.0));
     CGFloat blur = MIN(1.0, MAX(percentage, 0.0)) * (CGFloat) self.numberOfStages;
     NSUInteger blurIndex = (NSUInteger) blur;
