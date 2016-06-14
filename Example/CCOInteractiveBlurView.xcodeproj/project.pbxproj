@@ -35,7 +35,7 @@
 		6003F59C195388D20070C39A /* CCOAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCOAppDelegate.h; sourceTree = "<group>"; };
 		6003F59D195388D20070C39A /* CCOAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCOAppDelegate.m; sourceTree = "<group>"; };
 		6003F5A5195388D20070C39A /* CCOViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCOViewController.h; sourceTree = "<group>"; };
-		6003F5A6195388D20070C39A /* CCOViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCOViewController.m; sourceTree = "<group>"; };
+		6003F5A6195388D20070C39A /* CCOViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCOViewController.m; sourceTree = "<group>"; };
 		6003F5A8195388D20070C39A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6003F5AF195388D20070C39A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6307DEF1689E5F6432FB736F /* Pods-CCOInteractiveBlurView_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CCOInteractiveBlurView_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CCOInteractiveBlurView_Tests/Pods-CCOInteractiveBlurView_Tests.release.xcconfig"; sourceTree = "<group>"; };
