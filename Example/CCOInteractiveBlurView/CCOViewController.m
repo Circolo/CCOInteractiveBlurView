@@ -55,13 +55,13 @@
 #pragma mark - Internal methods
 
 - (void)onTap {
-    static BOOL hide = YES;
-    CGRect targetFrame = CGRectMake(0, hide ? self.blurBackgroundView.bounds.size.height - 100 : 0, 100, 100);
-    [self.blurBackgroundView showBlur:!hide
+    static BOOL show = YES;
+    CGRect targetFrame = CGRectMake(0, show ? 0 : self.blurBackgroundView.bounds.size.height - 100, 100, 100);
+    [self.blurBackgroundView showBlur:show
                              animated:YES
                              duration:0.5
                            completion:nil];
-    hide = !hide;
+    show = !show;
     [UIView animateWithDuration:0.5
                      animations:^{
                          self.dimmerView.frame = targetFrame;
