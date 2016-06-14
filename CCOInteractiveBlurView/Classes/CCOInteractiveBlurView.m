@@ -29,6 +29,7 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
 @property(nonatomic, strong) UIImageView *secondImageView;
 @property(nonatomic, assign) NSUInteger numberOfStages;
 @property(nonatomic, assign) CFAbsoluteTime animationStartTime;
+@property(nonatomic, strong) dispatch_queue_t queue;
 
 - (void)setupWithNumberOfStages:(NSUInteger)numberOfStages;
 - (void)animate:(NSUInteger)animationStep
@@ -94,8 +95,7 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
     self.blurredImages[0] = self.snapshotImage;
     now = CFAbsoluteTimeGetCurrent();
     DLog(@"starting to generate blurs");
-    dispatch_queue_t queue = dispatch_queue_create("com.chimera.blur_background_queue", DISPATCH_QUEUE_CONCURRENT);
-    dispatch_apply(self.numberOfStages, queue, ^(size_t i) {
+    dispatch_apply(self.numberOfStages, self.queue, ^(size_t i) {
         CFAbsoluteTime innerNow = CFAbsoluteTimeGetCurrent();
         static CGFloat maximumBlurRadius = 25.0f;
         self.blurredImagesDictionary[@(i + 1)] = [UIImageEffects imageByApplyingBlurToImage:self.snapshotImage
@@ -146,6 +146,7 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
 #pragma mark - Internal methods
 
 - (void)setupWithNumberOfStages:(NSUInteger)numberOfStages {
+    self.queue = dispatch_queue_create("com.circolo.blur_background_queue", DISPATCH_QUEUE_CONCURRENT);
     self.numberOfStages = numberOfStages;
     self.blurredImagesDictionary = [[NSMutableDictionary alloc] initWithCapacity:self.blurredImages.count];
     self.blurredImages = [[NSMutableArray alloc] initWithCapacity:numberOfStages + 2];
