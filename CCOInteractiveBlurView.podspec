@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CCOInteractiveBlurView'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'Interactive Blur View, inspired on UIVisualEffectView configured with UIBlurEffect.'
 
   s.description      = <<-DESC
