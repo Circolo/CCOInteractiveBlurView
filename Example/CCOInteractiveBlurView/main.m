@@ -3,7 +3,7 @@
 //  CCOInteractiveBlurView
 //
 //  Created by Gian Franco Zabarino on 06/10/2016.
-//  Copyright (c) 2016 Gian Franco Zabarino. All rights reserved.
+//  Copyright (c) 2016 Circolo. All rights reserved.
 //
 
 @import UIKit;
