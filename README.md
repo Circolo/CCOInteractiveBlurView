@@ -20,6 +20,10 @@ it, simply add the following line to your Podfile:
 pod "CCOInteractiveBlurView"
 ```
 
+## Contributions
+
+Base yourself on the latest changes of the `develop` branch (and of course send PRs to this repository's `develop` branch).  
+
 ## Author
 
 Gian Franco Zabarino, gfzabarino@gmail.com.  

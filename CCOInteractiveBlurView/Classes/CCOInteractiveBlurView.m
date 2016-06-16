@@ -3,7 +3,7 @@
 //  CCOInteractiveBlurView
 //
 //  Created by Gian Franco Zabarino on 10/6/16.
-//  Copyright © 2016 Gian Franco. All rights reserved.
+//  Copyright (c) 2016 Circolo. All rights reserved.
 //
 
 #import "CCOInteractiveBlurView.h"
@@ -140,7 +140,9 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
     now = CFAbsoluteTimeGetCurrent();
     DLog(@"starting to generate blurs");
     dispatch_apply(self.numberOfStages, self.queue, ^(size_t i) {
+#ifdef DEBUG
         CFAbsoluteTime innerNow = CFAbsoluteTimeGetCurrent();
+#endif
         self.blurredImagesDictionary[@(i + 1)] = [UIImageEffects imageByApplyingBlurToImage:self.snapshotImage
                                                                                  withRadius:self.maximumRadius * ((CGFloat) i / self.numberOfStages)
                                                                                   tintColor:nil

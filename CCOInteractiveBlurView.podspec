@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CCOInteractiveBlurView'
-  s.version          = '0.1.1'
+  s.version          = '0.1.2'
   s.summary          = 'Interactive Blur View, inspired on UIVisualEffectView configured with UIBlurEffect.'
 
   s.description      = <<-DESC
@@ -17,6 +17,6 @@ proportionally to a given percentage, ideal to be used with a UIPanGestureRecogn
 
   s.source_files = 'CCOInteractiveBlurView/Classes/**/*'
 
-  s.public_header_files = 'Pod/Classes/**/*.h'
+  s.public_header_files = 'CCOInteractiveBlurView/Classes/**/*.h'
   s.frameworks = 'UIKit', 'Accelerate'
 end
