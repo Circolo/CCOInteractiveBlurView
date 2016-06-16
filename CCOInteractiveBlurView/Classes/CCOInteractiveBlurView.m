@@ -11,6 +11,8 @@
 
 static NSUInteger const CCOBlurBackgroundViewDefaultNumberOfStages = 30;
 static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
+static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
+
 #ifndef DLog
 #ifdef DEBUG
 #define DLog(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
@@ -28,10 +30,13 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
 @property(nonatomic, strong) UIImageView *firstImageView;
 @property(nonatomic, strong) UIImageView *secondImageView;
 @property(nonatomic, assign) NSUInteger numberOfStages;
+@property(nonatomic, assign) CGFloat maximumRadius;
 @property(nonatomic, assign) CFAbsoluteTime animationStartTime;
 @property(nonatomic, strong) dispatch_queue_t queue;
+@property(nonatomic, assign) BOOL hitTestInProgress;
 
-- (void)setupWithNumberOfStages:(NSUInteger)numberOfStages;
+- (void)onBackgroundTap;
+- (void)setupWithMaximumRadius:(CGFloat)maximumRadius numberOfStages:(NSUInteger)numberOfStages;
 - (void)animate:(NSUInteger)animationStep
   startingIndex:(NSUInteger)startingIndex
      totalSteps:(NSUInteger)totalSteps
@@ -45,24 +50,63 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
     CGFloat _percentage;
 }
 
-#pragma mark - Constructors
+#pragma mark - View lifecycle
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    [self setupWithNumberOfStages:CCOBlurBackgroundViewDefaultNumberOfStages];
+    [self setupWithMaximumRadius:CCOBlurBackgroundViewDefaultMaximumRadius
+                  numberOfStages:CCOBlurBackgroundViewDefaultNumberOfStages];
 }
 
 - (instancetype)init {
-    return [self initWithNumberOfStages:CCOBlurBackgroundViewDefaultNumberOfStages];
+    return [self initWithDelegate:nil];
 }
 
-- (instancetype)initWithNumberOfStages:(NSUInteger)numberOfStages {
+- (instancetype)initWithDelegate:(id<CCOInteractiveBlurViewDelegate>)delegate {
+    return [self initWithMaximumRadius:CCOBlurBackgroundViewDefaultMaximumRadius
+                              delegate:delegate];
+}
+
+- (instancetype)initWithMaximumRadius:(CGFloat)maximumRadius
+                             delegate:(id<CCOInteractiveBlurViewDelegate>)delegate {
+    return [self initWithMaximumRadius:maximumRadius
+                        numberOfStages:CCOBlurBackgroundViewDefaultNumberOfStages
+                              delegate:delegate];
+}
+
+- (instancetype)initWithMaximumRadius:(CGFloat)maximumRadius
+                       numberOfStages:(NSUInteger)numberOfStages
+                             delegate:(id<CCOInteractiveBlurViewDelegate>)delegate {
     self = [super initWithFrame:CGRectZero];
     if (self) {
-        [self setupWithNumberOfStages:numberOfStages];
+        self.delegate = delegate;
+        [self setupWithMaximumRadius:maximumRadius numberOfStages:numberOfStages];
     }
     return self;
 }
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView *realTouchedView = [super hitTest:point withEvent:event];
+    if (self.isShowing) {
+        // showing, continue with normal flow
+        return realTouchedView;
+    }
+    if (self.hitTestInProgress) {
+        // we called this superview's method (see below), and now it's calling us, so make ourselves 'transparent'
+        return nil;
+    }
+    if (realTouchedView == self.firstImageView || realTouchedView == self.secondImageView || realTouchedView == self.contentView) {
+        self.hitTestInProgress = YES;
+        UIView *belowView = [self.superview hitTest:point withEvent:event];
+        self.hitTestInProgress = NO;
+        // return the view that should be touched if this view wouldn't be on the superview hierarchy
+        return belowView;
+    }
+    // a view that has been added by the user is being touched, return it
+    return realTouchedView;
+}
+
+#pragma mark - Public methods
 
 - (void)prepareBlurEffect {
     // temporarily hide the content view, since it shouldn't be blurred
@@ -97,9 +141,8 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
     DLog(@"starting to generate blurs");
     dispatch_apply(self.numberOfStages, self.queue, ^(size_t i) {
         CFAbsoluteTime innerNow = CFAbsoluteTimeGetCurrent();
-        static CGFloat maximumBlurRadius = 25.0f;
         self.blurredImagesDictionary[@(i + 1)] = [UIImageEffects imageByApplyingBlurToImage:self.snapshotImage
-                                                                                 withRadius:maximumBlurRadius * ((CGFloat) i / self.numberOfStages)
+                                                                                 withRadius:self.maximumRadius * ((CGFloat) i / self.numberOfStages)
                                                                                   tintColor:nil
                                                                       saturationDeltaFactor:1.0
                                                                                   maskImage:nil];
@@ -143,11 +186,20 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
     }
 }
 
+#pragma mark - Gesture Recognizers
+
+- (void)onBackgroundTap {
+    if ([self.delegate respondsToSelector:@selector(interactiveBlurViewOnBackgroundTap:)]) {
+        [self.delegate interactiveBlurViewOnBackgroundTap:self];
+    }
+}
+
 #pragma mark - Internal methods
 
-- (void)setupWithNumberOfStages:(NSUInteger)numberOfStages {
+- (void)setupWithMaximumRadius:(CGFloat)maximumRadius numberOfStages:(NSUInteger)numberOfStages {
     self.queue = dispatch_queue_create("com.circolo.blur_background_queue", DISPATCH_QUEUE_CONCURRENT);
     self.numberOfStages = numberOfStages;
+    self.maximumRadius = maximumRadius;
     self.blurredImagesDictionary = [[NSMutableDictionary alloc] initWithCapacity:self.blurredImages.count];
     self.blurredImages = [[NSMutableArray alloc] initWithCapacity:numberOfStages + 2];
     UIViewAutoresizing autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -159,11 +211,15 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
     self.firstImageView.autoresizingMask = autoresizingMask;
     self.firstImageView.frame = self.bounds;
     self.firstImageView.hidden = YES;
+    self.firstImageView.userInteractionEnabled = YES;
+    [self.firstImageView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onBackgroundTap)]];
     [self.contentView addSubview:self.firstImageView];
     self.secondImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     self.secondImageView.autoresizingMask = autoresizingMask;
     self.secondImageView.frame = self.bounds;
     self.secondImageView.hidden = YES;
+    self.secondImageView.userInteractionEnabled = YES;
+    [self.secondImageView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onBackgroundTap)]];
     [self.contentView addSubview:self.secondImageView];
 }
 
@@ -264,6 +320,10 @@ static NSUInteger const CCOBlurBackgroundViewMaximumAnimationsPerSecond = 60;
         self.firstImageView.hidden = NO;
         self.secondImageView.hidden = NO;
     }
+}
+
+- (BOOL)isShowing {
+    return _percentage > CGFLOAT_MIN;
 }
 
 @end

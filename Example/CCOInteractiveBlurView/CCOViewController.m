@@ -9,7 +9,7 @@
 #import "CCOViewController.h"
 #import <CCOInteractiveBlurView/CCOInteractiveBlurView.h>
 
-@interface CCOViewController ()
+@interface CCOViewController () <CCOInteractiveBlurViewDelegate, UIGestureRecognizerDelegate>
 
 @property(nonatomic, strong) UIImageView *backgroundImageView;
 @property(nonatomic, strong) UIView *dimmerView;
@@ -31,12 +31,13 @@
     self.backgroundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Background"]];
     self.backgroundImageView.autoresizingMask = autoresizingMask;
     self.backgroundImageView.frame = self.view.bounds;
+    self.backgroundImageView.userInteractionEnabled = YES;
+    [self.backgroundImageView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap)]];
     [self.view addSubview:self.backgroundImageView];
     self.dimmerView = [[UIView alloc] initWithFrame:CGRectZero];
     self.dimmerView.backgroundColor = [UIColor blackColor];
     [self.dimmerView addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onPan:)]];
-    [self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap)]];
-    self.blurBackgroundView = [[CCOInteractiveBlurView alloc] init];
+    self.blurBackgroundView = [[CCOInteractiveBlurView alloc] initWithDelegate:self];
     self.blurBackgroundView.autoresizingMask = autoresizingMask;
     self.blurBackgroundView.frame = self.view.bounds;
     [self.view addSubview:self.blurBackgroundView];
@@ -52,16 +53,29 @@
     }
 }
 
-#pragma mark - Internal methods
+#pragma mark - CCOInteractiveBlurViewDelegate methods
 
-- (void)onTap {
-    static BOOL show = YES;
-    CGRect targetFrame = CGRectMake(0, show ? 0 : self.blurBackgroundView.bounds.size.height - 100, 100, 100);
-    [self.blurBackgroundView showBlur:show
+- (void)interactiveBlurViewOnBackgroundTap:(CCOInteractiveBlurView *)interactiveBlurView {
+    CGRect targetFrame = CGRectMake(0, self.blurBackgroundView.bounds.size.height - 100, 100, 100);
+    [self.blurBackgroundView showBlur:NO
                              animated:YES
                              duration:0.5
                            completion:nil];
-    show = !show;
+    [UIView animateWithDuration:0.5
+                     animations:^{
+                         self.dimmerView.frame = targetFrame;
+                     }
+                     completion:nil];
+}
+
+#pragma mark - Gesture Recognizers
+
+- (void)onTap {
+    CGRect targetFrame = CGRectMake(0, 0, 100, 100);
+    [self.blurBackgroundView showBlur:YES
+                             animated:YES
+                             duration:0.5
+                           completion:nil];
     [UIView animateWithDuration:0.5
                      animations:^{
                          self.dimmerView.frame = targetFrame;
