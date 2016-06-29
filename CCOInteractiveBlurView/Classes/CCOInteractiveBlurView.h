@@ -17,6 +17,13 @@
 @property(nonatomic, assign) CGFloat percentage;
 @property(nonatomic, readonly, getter=isShowing) BOOL showing;
 
+/**
+ * When the blur effect is removed, it will clear generated blurred images. Leave this set if you want to save
+ * memory. However, blurred images will need to be generated at the beginning of each blur effect showing.
+ * Default is YES.
+ */
+@property(nonatomic, assign) BOOL shouldClearGeneratedImagesOnBlurRemoval;
+
 - (instancetype)init;
 
 - (instancetype)initWithDelegate:(id<CCOInteractiveBlurViewDelegate>)delegate;

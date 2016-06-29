@@ -29,6 +29,7 @@
     [super viewDidLoad];
     UIViewAutoresizing autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.backgroundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Background"]];
+    self.backgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
     self.backgroundImageView.autoresizingMask = autoresizingMask;
     self.backgroundImageView.frame = self.view.bounds;
     self.backgroundImageView.userInteractionEnabled = YES;
@@ -38,6 +39,7 @@
     self.dimmerView.backgroundColor = [UIColor blackColor];
     [self.dimmerView addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onPan:)]];
     self.blurBackgroundView = [[CCOInteractiveBlurView alloc] initWithDelegate:self];
+    self.blurBackgroundView.shouldClearGeneratedImagesOnBlurRemoval = NO;
     self.blurBackgroundView.autoresizingMask = autoresizingMask;
     self.blurBackgroundView.frame = self.view.bounds;
     [self.view addSubview:self.blurBackgroundView];
