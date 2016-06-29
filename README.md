@@ -1,5 +1,9 @@
 # CCOInteractiveBlurView
 
+## Demo
+
+[![Demo](https://j.gifs.com/XD965g.gif)](https://youtu.be/vXFOTZhi16M)
+
 ## Description
 
 This library aims to mimic the `UIVisualEffectView` behavior when configured with a `UIBlurEffect` effect.  

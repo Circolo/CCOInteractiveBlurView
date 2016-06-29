@@ -43,6 +43,7 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
        duration:(NSTimeInterval)duration
         reverse:(BOOL)reverse
      completion:(void (^)())completion;
+- (void)ensureGeneratedBlurredImages;
 
 @end
 
@@ -80,6 +81,7 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
     self = [super initWithFrame:CGRectZero];
     if (self) {
         self.delegate = delegate;
+        self.shouldClearGeneratedImagesOnBlurRemoval = YES;
         [self setupWithMaximumRadius:maximumRadius numberOfStages:numberOfStages];
     }
     return self;
@@ -163,10 +165,7 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
 }
 
 - (void)showBlur:(BOOL)showBlur animated:(BOOL)animated duration:(NSTimeInterval)duration completion:(void (^)())completion {
-    if (!self.blurredImages.count) {
-        DLog(@"No blurred images have been generated yet, please call prepareBlurEffect to fix this");
-        return;
-    }
+    [self ensureGeneratedBlurredImages];
     if (animated) {
         if (showBlur && self.firstImageView.hidden) {
             self.firstImageView.hidden = NO;
@@ -252,6 +251,10 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
                                  self.firstImageView.hidden = YES;
                                  self.secondImageView.hidden = YES;
                                  self.secondImageView.alpha = 0.0;
+                                 if (self.shouldClearGeneratedImagesOnBlurRemoval) {
+                                     [self.blurredImages removeAllObjects];
+
+                                 }
                              } else {
                                  self.secondImageView.alpha = 1.0;
                              }
@@ -288,6 +291,12 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
                      }];
 }
 
+- (void)ensureGeneratedBlurredImages {
+    if (!self.blurredImages.count) {
+        [self prepareBlurEffect];
+    }
+}
+
 #pragma mark - Override accessors
 
 - (CGFloat)percentage {
@@ -297,10 +306,7 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
 - (void)setPercentage:(CGFloat)percentage {
     _percentage = percentage;
     DLog(@"interactive percentage: %f", _percentage);
-    if (!self.blurredImages.count) {
-        DLog(@"No blurred images have been generated yet, please call prepareBlurEffect to fix this");
-        return;
-    }
+    [self ensureGeneratedBlurredImages];
     percentage = MIN(1.0, MAX(percentage, 0.0));
     CGFloat blur = MIN(1.0, MAX(percentage, 0.0)) * (CGFloat) (self.blurredImages.count - 2);
     NSUInteger blurIndex = (NSUInteger) blur;
