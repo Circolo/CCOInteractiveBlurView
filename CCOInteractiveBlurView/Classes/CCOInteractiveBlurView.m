@@ -232,12 +232,12 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
      completion:(void (^)())completion {
     if (!animationStep) {
         NSUInteger currentFirstImageIndex = (NSUInteger)(self.percentage * (self.blurredImages.count - 1));
-        if (reverse) {
+        if (reverse && currentFirstImageIndex) {
             currentFirstImageIndex--;
         }
         startingIndex = currentFirstImageIndex;
         NSUInteger availableImages = reverse ? currentFirstImageIndex : self.blurredImages.count - startingIndex - 1;
-        totalSteps = (NSUInteger)MIN((CCOBlurBackgroundViewMaximumAnimationsPerSecond * duration), availableImages);
+        totalSteps = MAX((NSUInteger)MIN((CCOBlurBackgroundViewMaximumAnimationsPerSecond * duration), availableImages), 1);
     }
     NSUInteger numberOfRemainingAnimations = totalSteps - animationStep;
     CFAbsoluteTime currentAnimationDuration = CFAbsoluteTimeGetCurrent() - self.animationStartTime;
@@ -268,6 +268,7 @@ static CGFloat const CCOBlurBackgroundViewDefaultMaximumRadius = 25.0;
                          } else {
                              _percentage = startingIndex * (1.0 - animationPercentage) / (CGFloat)self.blurredImages.count + animationPercentage;
                          }
+                         _percentage = MIN(1.0, MAX(_percentage, 0.0));
                          DLog(@"percentage: %f", _percentage);
                          if (finished) {
                              if (animationStep + 1 < totalSteps) {
